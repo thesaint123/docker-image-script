@@ -23,6 +23,8 @@ then
 echo "FROM ${FROM}" > Dockerfile
 else 
 echo " Please enter the base image. This is mandatory..."
+read FROM
+echo "FROM ${FROM}" > Dockerfile
 fi
 echo "Please enter the Maintainer"
 echo "Or press enter if there is no Maintainer"
