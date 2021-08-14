@@ -9,21 +9,22 @@ echo "Hi ${USER}, the purpose of this script is to create a Dockerfile"
 sleep 3
 echo "to build a docker image from the Dockerfile"
 sleep 3
-echo " and finally to delete the dockerfile"
+echo "and finally to delete the dockerfile"
 sleep 3
 echo "${USER}, please enter the instructions needed to create the Dockerfile as following"
+sleep 3
 echo "Be careful and double check your answers..."
 sleep 3
 echo "What is the base image?"
 read FROM
 # This command will create the Dockerfile and add the instruction FROM to the file created.
 # Since the base image is mandatory, we will put a mandatory condition in case the user doesn't answered the question.
-if [ -n "$FROM" ]
+if [ -z "$FROM" ]
 then
-echo "FROM ${FROM}" > Dockerfile
-else 
-echo " Please enter the base image. This is mandatory..."
-read FROM
+echo "The base image is mandatory," 
+echo "Please, find it and run the script again when you get it"
+exit 1
+else
 echo "FROM ${FROM}" > Dockerfile
 fi
 echo "Please enter the Maintainer"
@@ -40,7 +41,7 @@ echo " " >> Dockerfile
 fi
 echo "What commands are you willing to run?"
 echo "If multiple commandes, please seperates them with ; semi-colon"
-echo "Or press enter is there is no cammand"
+echo "Or press enter is there is no command"
 read RUN
 # This if condition will check if the user enter some commands to run.
 # In that case the instruction will be appended to the Docker file.
@@ -102,18 +103,29 @@ fi
 echo "What is the name of your image"
 read IMAGE
 echo "$IMAGE is being created............"
-# This command ewill create the docker image using the Dockerfile located in the present working directory.
-# The t option will tag the image will the name stored in the variable IMAGE.
-docker build -t ${IMAGE} .
+# This command will create the docker image using the Dockerfile located in the present working directory.
+# The t option will tag the image with the name stored in the variable IMAGE.
+#docker build -t ${IMAGE} . > /dev/null 2>&1
+docker build -t ${IMAGE} . 2> /dev/null
+if [ $? -gt 0 ]
+then
+rm -f Dockerfile
+echo "The image could not be build."
+sleep 1
+echo "Please double check the instructions you enter"
+echo "And run the script again."
+exit 1
+else
 sleep 3
 echo
 echo
 echo "Let's check if the image was created"
+fi
 sleep 3
 echo
 echo
 # The following command will display the list of the images on the server.
-docker images
+docker images 
 #This final command will delete the Dockerfile used to buil the image
 rm -f Dockerfile
 echo
